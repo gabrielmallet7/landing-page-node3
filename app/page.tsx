@@ -1609,15 +1609,12 @@ function Footer() {
           {/* Logo */}
           <div className="flex flex-col items-center md:items-start leading-none">
             <Image
-              src="/logos/node3.png"
+              src="/logos/node3-desarrollodesoftware.png"
               alt="Node3"
               width={130}
               height={36}
-              className="h-8 w-auto"
+              className="h-16 w-auto"
             />
-            <p className="font-mono text-[11px] text-muted-foreground mt-2">
-              desarrollo de software
-            </p>
           </div>
 
           {/* Copyright */}
