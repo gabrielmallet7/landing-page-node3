@@ -786,53 +786,23 @@ function Navbar({ onNavigate }: { onNavigate: (href: string) => void }) {  const
         // Mejora: Si el menú está abierto, forzamos el fondo oscuro para que el texto sea legible
         isScrolled || isMobileMenuOpen
           ? "bg-[#0A0F1E]/85 backdrop-blur-[12px] border-b border-[#1E293B]/80"
-          : "bg-transparent"
+          : "bg-[#0A0F1E]/92 backdrop-blur-[12px] border-b border-[#1E293B]/60 md:bg-transparent md:border-transparent md:backdrop-blur-none"
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20">
-          
-          {/* Logo */}
-          <a
-            href="#"
-            onClick={(e) => handleLinkClick(e, "#")}
-            className="flex items-center shrink-0" // shrink-0 evita que el logo se deforme
-          >
-            <Image
-              src="/logos/node3.png"
-              alt="Node3"
-              width={120}
-              height={32}
-              priority
-            />
-          </a>
-
-          {/* Menú desktop */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={(e) => handleLinkClick(e, link.href)}
-                className="relative text-muted-foreground hover:text-foreground font-medium text-sm transition-colors duration-200 group"
-              >
-                {link.label}
-                <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-[#00C2CB] transition-all duration-250 group-hover:w-full" />
-              </a>
-            ))}
-          </div>
 
           {/* Botón menú mobile */}
           <button
+            type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             // CORRECCIONES APLICADAS AQUÍ: relative y shrink-0
             className="md:hidden relative shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-[#161D2E] border border-[#1E293B] text-[#F0F4F8] hover:text-[#00C2CB] hover:border-[#00C2CB]/40 transition-all duration-200 z-50"
             aria-label="Toggle menu"
           >
             {isMobileMenuOpen ? (
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5" strokeWidth={2.25} />
             ) : (
-              <Menu className="w-5 h-5" />
+              <Menu className="w-5 h-5" strokeWidth={2.25} />
             )}
           </button>
         </div>
@@ -855,7 +825,6 @@ function Navbar({ onNavigate }: { onNavigate: (href: string) => void }) {  const
             </div>
           </div>
         )}
-      </div>
     </nav>
   )
 }
