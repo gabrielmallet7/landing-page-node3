@@ -1,0 +1,44 @@
+Listado de rutas de carpetas para el volumen Nuevo vol
+El número de serie del volumen es AC6C-C108
+D:.
+¦   apple-icon.png
+¦   estructura.txt
+¦   icon-dark-32x32.png
+¦   icon-light-32x32.png
+¦   icon.svg
+¦   placeholder-logo.png
+¦   placeholder-logo.svg
+¦   placeholder-user.jpg
+¦   placeholder.jpg
+¦   placeholder.svg
+¦   
++---logos
+¦       node3-desarrollodesoftware.png
+¦       node3.png
+¦       
++---projects
+¦   +---gym-node
+¦   ¦       caja-tesoreria.png
+¦   ¦       clientes.png
+¦   ¦       cuotas.png
+¦   ¦       historial.png
+¦   ¦       movimientos.png
+¦   ¦       panel-general.png
+¦   ¦       
+¦   +---trackit-one
+¦           calendario.png
+¦           concentracion.png
+¦           estadisticas.png
+¦           inicio.png
+¦           materias.png
+¦           tareas.png
+¦           
++---technologies
+        docker.png
+        go.png
+        java.png
+        next.png
+        postgresql.png
+        react.png
+        spring.png
+        
