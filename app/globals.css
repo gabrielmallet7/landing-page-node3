@@ -155,3 +155,62 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #2D3B4E;
 }
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+@keyframes rotate-device-hint {
+  0% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(90deg);
+  }
+}
+
+@keyframes rotate-hint-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  85% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.animate-rotate-device-hint {
+  animation: rotate-device-hint 1s ease-in-out forwards;
+}
+
+.animate-rotate-hint-fade {
+  animation: rotate-hint-fade 3s ease forwards;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active,
+a:active {
+  transition-duration: 0ms;
+}
+
+button,
+a {
+  cursor: pointer;
+}

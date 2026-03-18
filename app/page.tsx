@@ -18,7 +18,8 @@ import {
   Monitor,
   User,
   Linkedin,
-  Maximize2
+  Maximize2,
+  Smartphone
 } from "lucide-react"
 import { createPortal } from "react-dom"
 
@@ -139,6 +140,8 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
   const [isFullscreenSlideAnimating, setIsFullscreenSlideAnimating] = useState(false)
   const [showFullscreenOverlayText, setShowFullscreenOverlayText] = useState(true)
 
+  const [showRotateHint, setShowRotateHint] = useState(false)
+
   // Normaliza índices para loop infinito
   const getWrappedIndex = useCallback(
     (index: number) => (index + slides.length) % slides.length,
@@ -223,6 +226,12 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
     setIsFullscreenVisible(false)
   }, [])
 
+  const closeFullscreenWithDelay = useCallback(() => {
+  window.setTimeout(() => {
+    setIsFullscreenVisible(false)
+  }, 150)
+}, [])
+
   const currentSlide = slides[currentIndex]
 
   const getRelativeOffset = useCallback(
@@ -238,6 +247,25 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
     },
     [currentIndex, slides.length]
   )
+
+  useEffect(() => {
+    if (!isFullscreenMounted || !isFullscreenVisible) return
+
+    const isMobile = window.innerWidth < 768
+    const isPortrait = window.innerHeight > window.innerWidth
+
+    if (isMobile && isPortrait) {
+      setShowRotateHint(true)
+
+      const timer = window.setTimeout(() => {
+        setShowRotateHint(false)
+      }, 3000)
+
+      return () => window.clearTimeout(timer)
+    } else {
+      setShowRotateHint(false)
+    }
+  }, [isFullscreenMounted, isFullscreenVisible, currentIndex])
 
   useEffect(() => {
     if (!isFullscreenMounted) return
@@ -319,7 +347,7 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
   ) => {
     if (slide.src) {
       return (
-        <div className="absolute inset-0 flex items-center justify-center p-3 sm:p-4 lg:p-5">
+        <div className="absolute inset-0 flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-3 lg:p-5">
           <div className="relative w-full h-full rounded-[18px] overflow-hidden bg-[#0F172A]">
             <Image
               src={slide.src}
@@ -357,179 +385,179 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
   }
 
   const interactiveButtonClass =
-    "active:scale-95 active:brightness-110 transition-all duration-150"
-
+  "touch-manipulation transition-all duration-150 hover:scale-[1.03] hover:brightness-110 hover:bg-[rgba(0,194,203,0.18)] hover:border-[rgba(0,194,203,0.4)] active:scale-90 active:bg-[rgba(0,194,203,0.22)] active:border-[rgba(0,194,203,0.55)] active:text-[#00C2CB] active:brightness-100" 
   return (
     <>
       {/* =========================
       CARRUSEL NORMAL
       ========================= */}
-      <div className="w-full">
+    <div className="w-full overflow-x-hidden lg:overflow-x-visible">
+      <div className="relative w-full overflow-x-hidden overflow-y-visible lg:overflow-x-visible">
         <div className="relative w-full h-[330px] sm:h-[440px] lg:h-[560px] xl:h-[620px] overflow-visible">
           {/* Escena del carrusel */}
-          <div className="absolute inset-0 flex items-center justify-center px-6 sm:px-10 lg:px-14">
-            {slides.map((slide, index) => {
-              const offset = getRelativeOffset(index)
-              const isActive = offset === 0
-              const isLeft = offset === -1
-              const isRight = offset === 1
-              const isFarLeft = offset === -2
-              const isFarRight = offset === 2
+          <div className="absolute inset-0 flex items-center justify-center px-4 sm:px-8 lg:px-12">
+              {slides.map((slide, index) => {
+                const offset = getRelativeOffset(index)
+                const isActive = offset === 0
+                const isLeft = offset === -1
+                const isRight = offset === 1
+                const isFarLeft = offset === -2
+                const isFarRight = offset === 2
 
-              let transform = "translateX(0) scale(0.6)"
-              let opacity = 0
-              let zIndex = 0
-              let pointerEvents: "auto" | "none" = "none"
+                let transform = "translateX(0) scale(0.6)"
+                let opacity = 0
+                let zIndex = 0
+                let pointerEvents: "auto" | "none" = "none"
 
-              if (isActive) {
-                transform = "translateX(0%) scale(1) rotateY(0deg)"
-                opacity = 1
-                zIndex = 30
-                pointerEvents = "auto"
-              } else if (isLeft) {
-                transform = "translateX(-42%) scale(0.88) rotateY(14deg)"
-                opacity = 0.62
-                zIndex = 20
-                pointerEvents = "auto"
-              } else if (isRight) {
-                transform = "translateX(42%) scale(0.88) rotateY(-14deg)"
-                opacity = 0.62
-                zIndex = 20
-                pointerEvents = "auto"
-              } else if (isFarLeft) {
-                transform = "translateX(-64%) scale(0.78) rotateY(18deg)"
-                opacity = 0.16
-                zIndex = 10
-              } else if (isFarRight) {
-                transform = "translateX(64%) scale(0.78) rotateY(-18deg)"
-                opacity = 0.16
-                zIndex = 10
-              }
+                if (isActive) {
+                  transform = "translateX(0%) scale(1) rotateY(0deg)"
+                  opacity = 1
+                  zIndex = 30
+                  pointerEvents = "auto"
+                } else if (isLeft) {
+                  transform = "translateX(-36%) scale(0.88) rotateY(14deg)"
+                  opacity = 0.62
+                  zIndex = 20
+                  pointerEvents = "auto"
+                } else if (isRight) {
+                  transform = "translateX(36%) scale(0.88) rotateY(-14deg)"
+                  opacity = 0.62
+                  zIndex = 20
+                  pointerEvents = "auto"
+                } else if (isFarLeft) {
+                  transform = "translateX(-52%) scale(0.78) rotateY(18deg)"
+                  opacity = 0.16
+                  zIndex = 10
+                } else if (isFarRight) {
+                  transform = "translateX(52%) scale(0.78) rotateY(-18deg)"
+                  opacity = 0.16
+                  zIndex = 10
+                }
 
-              return (
-                <div
-                  key={slide.label + index}
-                  className="absolute top-1/2 left-1/2 w-[94%] md:w-[78%] h-[92%] md:h-[88%]"
-                  style={{
-                    transform: `translate(-50%, -50%) ${transform}`,
-                    opacity,
-                    zIndex,
-                    pointerEvents,
-                    transition:
-                      "transform 650ms cubic-bezier(0.22, 1, 0.36, 1), opacity 650ms ease",
-                  }}
-                >
-                  <div className="relative w-full h-full rounded-[22px] overflow-hidden border border-[rgba(255,255,255,0.12)] shadow-[0_28px_80px_rgba(0,0,0,0.34)] bg-[#111827]">
-                    {/* Área clickeable según posición */}
-                    {isActive && (
-                      <button
-                        type="button"
-                        onClick={openFullscreen}
-                        className={`absolute inset-0 z-10 ${interactiveButtonClass}`}
-                        aria-label="Abrir imagen en pantalla completa"
-                      />
-                    )}
-
-                    {isLeft && (
-                      <button
-                        type="button"
-                        onClick={goToPrevious}
-                        className={`absolute inset-0 z-10 hidden md:block ${interactiveButtonClass}`}
-                        aria-label="Ir a la imagen anterior"
-                      />
-                    )}
-
-                    {isRight && (
-                      <button
-                        type="button"
-                        onClick={goToNext}
-                        className={`absolute inset-0 z-10 hidden md:block ${interactiveButtonClass}`}
-                        aria-label="Ir a la imagen siguiente"
-                      />
-                    )}
-
-                    {renderSlideImage(slide, slide.label, isActive)}
-
-                    {/* Oscurecimiento suave en laterales */}
-                    {!isActive && (
-                      <div className="absolute inset-0 bg-[#0A0F1E]/22 pointer-events-none" />
-                    )}
-
-                    {/* Gradiente + texto solo en la slide activa */}
-                    {isActive && (
-                      <>
-                        <div
-                          className="absolute inset-x-0 bottom-0 pointer-events-none transition-opacity duration-500"
-                          style={{
-                            height: "42%",
-                            opacity: showOverlayText ? 1 : 0.82,
-                            background:
-                              "linear-gradient(to top, rgba(10, 15, 30, 0.96) 0%, rgba(10, 15, 30, 0.58) 38%, rgba(10, 15, 30, 0) 100%)",
-                          }}
-                        />
-
-                        <div
-                          className={`absolute left-0 right-0 bottom-0 p-5 sm:p-7 lg:px-9 lg:py-8 text-left pointer-events-none transition-all duration-500 ${
-                            showOverlayText
-                              ? "opacity-100 translate-y-0"
-                              : "opacity-0 translate-y-2"
-                          }`}
-                        >
-                          <span className="font-mono text-xs text-[#94A3B8] block mb-1.5">
-                            {slide.label}
-                          </span>
-                          <p className="text-[14px] sm:text-[15px] text-[#F0F4F8] max-w-[700px]">
-                            {slide.description}
-                          </p>
-                        </div>
-
-                        {/* Botón fullscreen */}
+                return (
+                  <div
+                    key={slide.label + index}
+                    className="absolute top-1/2 left-1/2 w-[82%] sm:w-[86%] md:w-[84%] xl:w-[88%] h-[60%] sm:h-[72%] md:h-[88%]"
+                    style={{
+                      transform: `translate(-50%, -50%) ${transform}`,
+                      opacity,
+                      zIndex,
+                      pointerEvents,
+                      transition:
+                        "transform 650ms cubic-bezier(0.22, 1, 0.36, 1), opacity 650ms ease",
+                    }}
+                  >
+                    <div className="relative w-full h-full rounded-[22px] overflow-hidden border border-[rgba(255,255,255,0.12)] shadow-[0_28px_80px_rgba(0,0,0,0.34)] bg-[#111827]">
+                      {/* Área clickeable según posición */}
+                      {isActive && (
                         <button
                           type="button"
                           onClick={openFullscreen}
-                          className={`absolute top-4 right-4 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-[rgba(10,15,30,0.62)] border border-[rgba(255,255,255,0.1)] text-[#F0F4F8] hover:bg-[rgba(0,194,203,0.18)] hover:border-[rgba(0,194,203,0.4)] transition-all duration-200 z-30 ${interactiveButtonClass}`}
-                          aria-label="Pantalla completa"
-                        >
-                          <Maximize2 className="w-[18px] h-[18px]" />
-                        </button>
-                      </>
-                    )}
+                          className={`absolute inset-0 z-10 ${interactiveButtonClass}`}
+                          aria-label="Abrir imagen en pantalla completa"
+                        />
+                      )}
+                    
+                      {isLeft && (
+                        <button
+                          type="button"
+                          onClick={goToPrevious}
+                          className={`absolute inset-0 z-10 hidden md:block ${interactiveButtonClass}`}
+                          aria-label="Ir a la imagen anterior"
+                        />
+                      )}
+
+                      {isRight && (
+                        <button
+                          type="button"
+                          onClick={goToNext}
+                          className={`absolute inset-0 z-10 hidden md:block ${interactiveButtonClass}`}
+                          aria-label="Ir a la imagen siguiente"
+                        />
+                      )}
+
+                      {renderSlideImage(slide, slide.label, isActive)}
+
+                      {/* Oscurecimiento suave en laterales */}
+                      {!isActive && (
+                        <div className="absolute inset-0 bg-[#0A0F1E]/22 pointer-events-none" />
+                      )}
+
+                      {/* Gradiente + texto solo en la slide activa */}
+                      {isActive && (
+                        <>
+                          <div
+                            className="absolute inset-x-0 bottom-0 pointer-events-none transition-opacity duration-500"
+                            style={{
+                              height: "42%",
+                              opacity: showOverlayText ? 1 : 0.82,
+                              background:
+                                "linear-gradient(to top, rgba(10, 15, 30, 0.96) 0%, rgba(10, 15, 30, 0.58) 38%, rgba(10, 15, 30, 0) 100%)",
+                            }}
+                          />
+
+                          <div
+                            className={`absolute left-0 right-0 bottom-0 p-5 sm:p-7 lg:px-9 lg:py-8 text-left pointer-events-none transition-all duration-500 ${
+                              showOverlayText
+                                ? "opacity-100 translate-y-0"
+                                : "opacity-0 translate-y-2"
+                            }`}
+                          >
+                            <span className="font-mono text-xs text-[#94A3B8] block mb-1.5">
+                              {slide.label}
+                            </span>
+                            <p className="text-[14px] sm:text-[15px] text-[#F0F4F8] max-w-[700px]">
+                              {slide.description}
+                            </p>
+                          </div>
+
+                          {/* Botón fullscreen */}
+                          <button
+                            type="button"
+                            onClick={openFullscreen}
+                            className={`absolute top-4 right-4 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-[rgba(10,15,30,0.62)] border border-[rgba(255,255,255,0.1)] text-[#F0F4F8] hover:bg-[rgba(0,194,203,0.18)] hover:border-[rgba(0,194,203,0.4)] transition-all duration-200 z-30 ${interactiveButtonClass}`}
+                            aria-label="Pantalla completa"
+                          >
+                            <Maximize2 className="w-[18px] h-[18px]" />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
+
+            {/* Flecha izquierda */}
+            <button
+              type="button"
+              onClick={goToPrevious}
+              className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-[rgba(10,15,30,0.62)] border border-[rgba(255,255,255,0.1)] text-[#F0F4F8] hover:bg-[rgba(0,194,203,0.18)] hover:border-[rgba(0,194,203,0.4)] transition-all duration-200 z-40 ${interactiveButtonClass}`}
+              aria-label="Anterior"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            {/* Flecha derecha */}
+            <button
+              type="button"
+              onClick={goToNext}
+              className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-[rgba(10,15,30,0.62)] border border-[rgba(255,255,255,0.1)] text-[#F0F4F8] hover:bg-[rgba(0,194,203,0.18)] hover:border-[rgba(0,194,203,0.4)] transition-all duration-200 z-40 ${interactiveButtonClass}`}
+              aria-label="Siguiente"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
-
-          {/* Flecha izquierda */}
-          <button
-            type="button"
-            onClick={goToPrevious}
-            className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-[rgba(10,15,30,0.62)] border border-[rgba(255,255,255,0.1)] text-[#F0F4F8] hover:bg-[rgba(0,194,203,0.18)] hover:border-[rgba(0,194,203,0.4)] transition-all duration-200 z-40 ${interactiveButtonClass}`}
-            aria-label="Anterior"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-
-          {/* Flecha derecha */}
-          <button
-            type="button"
-            onClick={goToNext}
-            className={`absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-[rgba(10,15,30,0.62)] border border-[rgba(255,255,255,0.1)] text-[#F0F4F8] hover:bg-[rgba(0,194,203,0.18)] hover:border-[rgba(0,194,203,0.4)] transition-all duration-200 z-40 ${interactiveButtonClass}`}
-            aria-label="Siguiente"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
         </div>
-
         {/* Dots */}
-        <div className="flex justify-center gap-1.5 mt-5">
+        <div className="flex justify-center gap-1.5 mt-2 sm:mt-4">
           {slides.map((slide, index) => (
             <button
               key={slide.label + index}
               type="button"
               onClick={() => goToIndex(index)}
-              className={`h-2 rounded transition-all duration-200 active:scale-90 ${
-                index === currentIndex
+              className={`h-2 rounded touch-manipulation transition-all duration-150 hover:brightness-110 active:scale-75 active:brightness-125 ${        
+                  index === currentIndex
                   ? "bg-[#00C2CB] w-6"
                   : "bg-[#1E293B] w-2 hover:bg-[#2D3B4E]"
               }`}
@@ -551,11 +579,21 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
             }`}
           >
             <div className="relative w-screen h-screen overflow-hidden">
+             {showRotateHint && (
+              <div className="absolute top-4 left-0 w-full flex justify-center z-40 pointer-events-none animate-rotate-hint-fade">
+                <div className="flex items-center justify-center w-11 h-11 rounded-full bg-[rgba(10,15,30,0.72)] border border-[rgba(255,255,255,0.1)] backdrop-blur-sm shadow-[0_8px_24px_rgba(0,0,0,0.28)]">
+                  <Smartphone className="w-5 h-5 text-[#F0F4F8] animate-rotate-device-hint" />
+                </div>
+              </div>
+            )}
               {/* Imagen principal fullscreen */}
-              <button
+             <button
                 type="button"
-                onClick={() => setShowFullscreenOverlayText(false)}
-                className="absolute inset-0 flex items-center justify-center px-4 sm:px-8"
+                onClick={() => {
+                  setShowFullscreenOverlayText(false)
+                  setShowRotateHint(false)
+                }}
+                className="absolute inset-0 flex items-center justify-center px-4 sm:px-8 bg-transparent hover:bg-transparent active:bg-transparent focus:outline-none touch-manipulation"
                 aria-label="Ocultar información de la imagen"
               >
                 <div
@@ -592,7 +630,7 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
               />
 
               <div
-                className={`absolute left-0 right-0 bottom-0 px-6 py-6 sm:px-8 sm:py-8 lg:px-12 lg:py-10 text-left pointer-events-none transition-all duration-500 z-20 ${
+                className={`absolute left-0 right-0 bottom-0 px-6 pt-6 pb-16 sm:px-8 sm:pt-8 sm:pb-20 lg:px-12 lg:py-10 text-left pointer-events-none transition-all duration-500 z-20 ${
                   showFullscreenOverlayText && isFullscreenVisible
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-2"
@@ -633,8 +671,8 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
               {/* Cerrar */}
               <button
                 type="button"
-                onClick={closeFullscreen}
-                className={`absolute top-4 right-4 sm:top-6 sm:right-6 z-30 w-10 h-10 flex items-center justify-center rounded-full bg-[rgba(10,15,30,0.62)] border border-[rgba(255,255,255,0.1)] text-[#F0F4F8] hover:bg-[rgba(0,194,203,0.2)] hover:border-[rgba(0,194,203,0.4)] transition-all duration-300 delay-100 ${interactiveButtonClass} ${
+                onClick={closeFullscreenWithDelay}
+                className={`absolute top-4 right-4 sm:top-6 sm:right-6 z-30 w-10 h-10 flex items-center justify-center rounded-full bg-[rgba(10,15,30,0.62)] border border-[rgba(255,255,255,0.1)] text-[#F0F4F8] hover:bg-[rgba(0,194,203,0.2)] hover:border-[rgba(0,194,203,0.4)] active:bg-[rgba(0,194,203,0.24)] active:border-[rgba(0,194,203,0.6)] active:text-[#00C2CB] transition-all duration-300 delay-100 ${interactiveButtonClass} ${
                   isFullscreenVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-2"
                 }`}
                 aria-label="Cerrar pantalla completa"
@@ -653,8 +691,7 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
                     key={slide.label + "-fullscreen-" + index}
                     type="button"
                     onClick={() => goToIndex(index)}
-                    className={`h-2 rounded transition-all duration-200 active:scale-90 ${
-                      index === currentIndex
+                    className={`h-2 rounded transition-all duration-150 hover:brightness-110 active:scale-90 active:brightness-110 ${                      index === currentIndex
                         ? "bg-[#00C2CB] w-6"
                         : "bg-[#1E293B] w-2 hover:bg-[#2D3B4E]"
                     }`}
@@ -754,14 +791,31 @@ function StaggeredBadges({
 // NAVBAR COMPONENT
 // =============================================
 
-function Navbar({ onNavigate }: { onNavigate: (href: string) => void }) {  const [isScrolled, setIsScrolled] = useState(false)
+function Navbar({ onNavigate }: { onNavigate: (href: string) => void }) {
+  const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [pressedMobileLink, setPressedMobileLink] = useState<string | null>(null)
+  const navRef = useRef<HTMLElement | null>(null)
 
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 10)
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+useEffect(() => {
+  const handlePointerOutside = (event: MouseEvent | TouchEvent) => {
+    if (!isMobileMenuOpen) return
+
+    const target = event.target as Node
+    if (navRef.current && !navRef.current.contains(target)) {
+      setIsMobileMenuOpen(false)
+      setPressedMobileLink(null)
+    }
+  }
+
+  document.addEventListener("mousedown", handlePointerOutside)
+  document.addEventListener("touchstart", handlePointerOutside)
+
+  return () => {
+    document.removeEventListener("mousedown", handlePointerOutside)
+    document.removeEventListener("touchstart", handlePointerOutside)
+  }
+}, [isMobileMenuOpen])
 
   const navLinks = [
     { href: "#nosotros", label: "Nosotros" },
@@ -776,12 +830,27 @@ function Navbar({ onNavigate }: { onNavigate: (href: string) => void }) {  const
     href: string
   ) => {
     e.preventDefault()
-    setIsMobileMenuOpen(false)
+
+    const isMobileViewport = window.innerWidth < 768
+
+    if (isMobileMenuOpen && isMobileViewport) {
+      setPressedMobileLink(href)
+
+      window.setTimeout(() => {
+        setIsMobileMenuOpen(false)
+        setPressedMobileLink(null)
+        onNavigate(href)
+      }, 150)
+
+      return
+    }
+
     onNavigate(href)
   }
 
   return (
     <nav
+      ref={navRef}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         // Mejora: Si el menú está abierto, forzamos el fondo oscuro para que el texto sea legible
         isScrolled || isMobileMenuOpen
@@ -809,26 +878,36 @@ function Navbar({ onNavigate }: { onNavigate: (href: string) => void }) {  const
 
           {/* Menú desktop */}
           <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={(e) => handleLinkClick(e, link.href)}
-                className="relative text-muted-foreground hover:text-foreground font-medium text-sm transition-colors duration-200 group"
-              >
-                {link.label}
-                <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-[#00C2CB] transition-all duration-250 group-hover:w-full" />
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const isPressed = pressedMobileLink === link.href
+
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={(e) => handleLinkClick(e, link.href)}
+                  className={`relative inline-flex items-center rounded-md px-2 py-1 font-medium text-sm touch-manipulation transition-all duration-150 group ${
+                    isPressed
+                      ? "text-[#00C2CB] bg-[rgba(0,194,203,0.12)] scale-95"
+                      : "text-muted-foreground hover:text-foreground active:scale-95 active:text-[#00C2CB]"
+                  }`}
+                >
+                  {link.label}
+                  <span
+                    className={`absolute left-2 right-2 -bottom-0.5 h-[2px] bg-[#00C2CB] transition-all duration-200 ${
+                      isPressed ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                    }`}
+                  />
+                </a>
+              )
+            })}
           </div>
 
           {/* Botón menú mobile */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             // CORRECCIONES APLICADAS AQUÍ: relative y shrink-0
-            className="md:hidden relative shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-[#161D2E] border border-[#1E293B] text-[#F0F4F8] hover:text-[#00C2CB] hover:border-[#00C2CB]/40 transition-all duration-200 z-50"
-            aria-label="Toggle menu"
-          >
+            className="md:hidden relative shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-[#161D2E] border border-[#1E293B] text-[#F0F4F8] hover:text-[#00C2CB] hover:border-[#00C2CB]/40 touch-manipulation transition-all duration-150 z-50 hover:scale-[1.03] active:scale-95 active:bg-[rgba(0,194,203,0.12)] active:border-[#00C2CB]/70 active:text-[#00C2CB]">
             {isMobileMenuOpen ? (
               <X className="w-5 h-5" />
             ) : (
@@ -846,11 +925,9 @@ function Navbar({ onNavigate }: { onNavigate: (href: string) => void }) {  const
                   key={link.href}
                   href={link.href}
                   onClick={(e) => handleLinkClick(e, link.href)}
-                  className="relative inline-block text-muted-foreground hover:text-foreground font-medium text-sm transition-colors duration-200 group"
-                >
+                  className="relative inline-block rounded-md px-2 py-1 text-muted-foreground hover:text-foreground font-medium text-sm touch-manipulation transition-all duration-150 group active:scale-95 active:text-[#00C2CB] active:bg-[rgba(0,194,203,0.12)]">
                   {link.label}
-                  <span className="absolute left-0 -bottom-0.5 w-0 h-[2px] bg-[#00C2CB] transition-all duration-250 group-hover:w-full" />
-                </a>
+                  <span className="absolute left-0 -bottom-0.5 w-0 h-[2px] bg-[#00C2CB] transition-all duration-250 group-hover:w-full group-active:w-full" />                </a>
               ))}
             </div>
           </div>
@@ -878,24 +955,7 @@ function HeroSection({ onNavigate }: { onNavigate: (href: string) => void }) {
       />
 
       <div className="relative z-10 max-w-4xl mx-auto text-center">
-              {/* Logo */}
-      <div
-        style={{
-          opacity: isInView ? 1 : 0,
-          transform: isInView ? "translateY(0)" : "translateY(-12px)",
-          transition: "all 600ms ease-out 0ms"
-        }}
-        className="flex justify-center mb-5 sm:mb-6"
-      >
-        <Image
-          src="/logos/node3.png"
-          alt="Node3"
-          width={100}
-          height={33}
-          priority
-          className="h-10 sm:h-12 w-auto"
-        />
-      </div>
+
         {/* Badge */}
         <div 
           className="inline-flex items-center px-3 py-1.5 mb-6 sm:mb-8 rounded-[6px] bg-[#161D2E] border border-[#1E293B]"
@@ -947,14 +1007,16 @@ function HeroSection({ onNavigate }: { onNavigate: (href: string) => void }) {
          <button
             type="button"
             onClick={() => onNavigate("#proyectos")}
-            className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-lg bg-[#00C2CB] text-[#0A0F1E] font-semibold text-sm transition-all duration-200 hover:shadow-[0_0_20px_rgba(0,194,203,0.25)]"
-          >
+            // Abajo están todas las clases de diseño (Tailwind)
+            className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-lg bg-[#00C2CB] text-[#0A0F1E] font-semibold text-sm touch-manipulation transition-all duration-150 hover:shadow-[0_0_20px_rgba(0,194,203,0.25)] hover:scale-[1.02] active:scale-95 active:brightness-95 active:shadow-none"
+          > 
+            {/* El '>' de arriba cierra la etiqueta de apertura */}
             Ver proyectos
           </button>
           <button
             type="button"
             onClick={() => onNavigate("#contacto")}
-            className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-lg border border-[#00C2CB] text-[#00C2CB] font-semibold text-sm transition-all duration-200 hover:shadow-[0_0_20px_rgba(0,194,203,0.25)]"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-lg border border-[#00C2CB] text-[#00C2CB] font-semibold text-sm touch-manipulation transition-all duration-150 hover:shadow-[0_0_20px_rgba(0,194,203,0.25)] hover:scale-[1.02] active:scale-95 active:bg-[#00C2CB]/10 active:border-[#00C2CB]/70"
           >
             Hablemos
           </button>
@@ -1124,8 +1186,7 @@ function TeamSection() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`Ver LinkedIn de ${member.name}`}
-                    className="text-[#94A3B8] hover:text-[#F0F4F8] transition-colors duration-200 cursor-pointer"
-                  >
+                    className="text-[#94A3B8] hover:text-[#F0F4F8] transition-all duration-150 cursor-pointer hover:scale-110 active:scale-95"                  >
                     <Linkedin className="w-5 h-5" strokeWidth={1.5} />
                   </a>
                 </div>
@@ -1157,45 +1218,45 @@ function ProjectBlock({
   return (
     <AnimatedSection direction="up" delay={delay}>
       <div className="w-full">
-        {/* Project Header */}
-        <div className="flex flex-wrap items-center gap-4 mb-6 px-0 sm:px-[2.5%] lg:px-[5%]">
+        {/* Header con ancho controlado */}
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-wrap items-center gap-4 mb-2 sm:mb-4 lg:mb-6 px-0 sm:px-[2.5%] lg:px-[5%]">
+            <h3 className="text-[24px] font-bold text-[#F0F4F8]">
+              {name}
+            </h3>
 
-          {/* Project Name */}
-          <h3 className="text-[24px] font-bold text-[#F0F4F8]">
-            {name}
-          </h3>
-
-          {/* Status Badge */}
-          <div className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#161D2E] border border-[#1E293B]">
-            <span className="font-mono text-xs text-[#94A3B8]">
-              MVP en desarrollo
-            </span>
+            <div className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#161D2E] border border-[#1E293B]">
+              <span className="font-mono text-xs text-[#94A3B8]">
+                MVP en desarrollo
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Carousel */}
-        <ProjectCarousel slides={slides} />
+        {/* Carrusel con ancho más amplio en desktop */}
+        <div className="w-full xl:px-6 2xl:px-10">
+          <ProjectCarousel slides={slides} />
+        </div>
 
-        {/* Project Info */}
-        <div className="mt-8 px-0 sm:px-[2.5%] lg:px-[5%]">
-          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
-            {/* Description - Left */}
-            <p className="text-[15px] text-[#94A3B8] leading-relaxed max-w-[480px]">
-              {description}
-            </p>
+        {/* Info con ancho controlado */}
+        <div className="max-w-6xl mx-auto">
+          <div className="mt-4 sm:mt-6 px-0 sm:px-[2.5%] lg:px-[5%]">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+              <p className="text-[15px] text-[#94A3B8] leading-relaxed max-w-[480px]">
+                {description}
+              </p>
 
-            {/* Stack & CTA - Right */}
-            <div className="flex flex-col items-start lg:items-end gap-4">
-              {/* Stack Tags */}
-              <div className="flex flex-wrap gap-2 lg:justify-end">
-                {stack.map((tech) => (
-                  <span
-                    key={tech}
-                    className="font-mono text-xs px-2.5 py-1 rounded-[6px] bg-[#0A0F1E] border border-[#1E293B] text-[#94A3B8] hover:border-[rgba(0,194,203,0.3)] hover:text-[#F0F4F8] transition-all duration-150"
-                  >
-                    {tech}
-                  </span>
-                ))}
+              <div className="flex flex-col items-start lg:items-end gap-4">
+                <div className="flex flex-wrap gap-2 lg:justify-end">
+                  {stack.map((tech) => (
+                    <span
+                      key={tech}
+                      className="font-mono text-xs px-2.5 py-1 rounded-[6px] bg-[#0A0F1E] border border-[#1E293B] text-[#94A3B8] hover:border-[rgba(0,194,203,0.3)] hover:text-[#F0F4F8] transition-all duration-150"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -1551,8 +1612,7 @@ function ContactSection() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full sm:w-auto min-w-[220px] px-8 py-3 rounded-lg bg-[#00C2CB] text-[#0A0F1E] font-semibold text-sm transition-all duration-200 hover:shadow-[0_0_20px_rgba(0,194,203,0.25)] disabled:opacity-60 disabled:cursor-not-allowed"
-              >
+                className="w-full sm:w-auto min-w-[220px] px-8 py-3 rounded-lg bg-[#00C2CB] text-[#0A0F1E] font-semibold text-sm touch-manipulation transition-all duration-150 hover:shadow-[0_0_20px_rgba(0,194,203,0.25)] hover:scale-[1.02] active:scale-95 active:brightness-95 active:shadow-none disabled:opacity-60 disabled:cursor-not-allowed">
                 {isSubmitting ? "Enviando..." : "Enviar mensaje"}
               </button>
             </div>
@@ -1575,8 +1635,7 @@ function ContactSection() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
               <a
                 href="mailto:node3solutions@gmail.com"
-                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors duration-200"
-              >
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all duration-150 hover:scale-[1.03] active:scale-95 active:text-foreground"              >
                 <Mail className="w-4 h-4" strokeWidth={1.5} />
                 <span className="text-sm">node3solutions@gmail.com</span>
               </a>
@@ -1585,8 +1644,7 @@ function ContactSection() {
                 href="https://instagram.com/node3sw"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors duration-200"
-              >
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all duration-150 hover:scale-[1.03] active:scale-95 active:text-foreground"              >
                 <Instagram className="w-4 h-4" strokeWidth={1.5} />
                 <span className="text-sm">@node3sw</span>
               </a>
@@ -1660,7 +1718,7 @@ export default function Node3LandingPage() {
   }, [])
 
   return (
-    <main className="min-h-screen bg-[#0A0F1E]">
+    <main className="min-h-screen bg-[#0A0F1E] overflow-x-hidden">
       <Navbar onNavigate={scrollToSection} />
       <HeroSection onNavigate={scrollToSection} />
       <AboutSection />
