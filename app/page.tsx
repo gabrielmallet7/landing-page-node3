@@ -140,7 +140,17 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
   const [isFullscreenSlideAnimating, setIsFullscreenSlideAnimating] = useState(false)
   const [showFullscreenOverlayText, setShowFullscreenOverlayText] = useState(true)
 
+  const [isFullscreenPortraitMobile, setIsFullscreenPortraitMobile] = useState(false)
+
   const [showRotateHint, setShowRotateHint] = useState(false)
+
+  const [swipeOffsetX, setSwipeOffsetX] = useState(0)
+
+  const touchStartXRef = useRef<number | null>(null)
+  const touchStartYRef = useRef<number | null>(null)
+  const touchEndXRef = useRef<number | null>(null)
+  const touchEndYRef = useRef<number | null>(null)
+  const didSwipeRef = useRef(false)
 
   // Normaliza índices para loop infinito
   const getWrappedIndex = useCallback(
@@ -247,6 +257,27 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
     },
     [currentIndex, slides.length]
   )
+
+  useEffect(() => {
+  if (!isFullscreenMounted || !isFullscreenVisible) {
+    setIsFullscreenPortraitMobile(false)
+    return
+  }
+
+  const updateFullscreenViewportMode = () => {
+    const isMobile = window.innerWidth < 768
+    const isPortrait = window.innerHeight > window.innerWidth
+
+    setIsFullscreenPortraitMobile(isMobile && isPortrait)
+  }
+
+  updateFullscreenViewportMode()
+  window.addEventListener("resize", updateFullscreenViewportMode)
+
+  return () => {
+    window.removeEventListener("resize", updateFullscreenViewportMode)
+  }
+}, [isFullscreenMounted, isFullscreenVisible])
 
   useEffect(() => {
     if (!isFullscreenMounted || !isFullscreenVisible) return
@@ -384,6 +415,76 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
     return "opacity-100 translate-x-3 scale-[0.985]"
   }
 
+  const SWIPE_THRESHOLD = 50
+
+  const handleSwipeTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    const touch = e.touches[0]
+
+    touchStartXRef.current = touch.clientX
+    touchStartYRef.current = touch.clientY
+    touchEndXRef.current = touch.clientX
+    touchEndYRef.current = touch.clientY
+    didSwipeRef.current = false
+  }
+
+  const handleSwipeTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    const touch = e.touches[0]
+
+    touchEndXRef.current = touch.clientX
+    touchEndYRef.current = touch.clientY
+
+    if (touchStartXRef.current === null || touchStartYRef.current === null) return
+
+    const deltaX = touch.clientX - touchStartXRef.current
+    const deltaY = touch.clientY - touchStartYRef.current
+
+    const absDeltaX = Math.abs(deltaX)
+    const absDeltaY = Math.abs(deltaY)
+
+    // Solo damos respuesta visual si el gesto es principalmente horizontal
+    if (absDeltaX > absDeltaY) {
+      // Limitamos el desplazamiento visual para que no se mueva demasiado
+      const clampedOffset = Math.max(-45, Math.min(45, deltaX * 0.35))
+      setSwipeOffsetX(clampedOffset)
+    }
+  }
+
+const handleSwipeTouchEnd = () => {
+  if (
+    touchStartXRef.current === null ||
+    touchStartYRef.current === null ||
+    touchEndXRef.current === null ||
+    touchEndYRef.current === null
+  ) {
+    setSwipeOffsetX(0)
+    return
+  }
+
+  const deltaX = touchEndXRef.current - touchStartXRef.current
+  const deltaY = touchEndYRef.current - touchStartYRef.current
+
+  const absDeltaX = Math.abs(deltaX)
+  const absDeltaY = Math.abs(deltaY)
+
+  // Solo tomamos el gesto si es claramente horizontal
+  if (absDeltaX > SWIPE_THRESHOLD && absDeltaX > absDeltaY) {
+    didSwipeRef.current = true
+
+    if (deltaX < 0) {
+      goToNext()
+    } else {
+      goToPrevious()
+    }
+  }
+
+  setSwipeOffsetX(0)
+
+  touchStartXRef.current = null
+  touchStartYRef.current = null
+  touchEndXRef.current = null
+  touchEndYRef.current = null
+}
+
   const interactiveButtonClass =
   "touch-manipulation transition-all duration-150 hover:scale-[1.03] hover:brightness-110 hover:bg-[rgba(0,194,203,0.18)] hover:border-[rgba(0,194,203,0.4)] active:scale-90 active:bg-[rgba(0,194,203,0.22)] active:border-[rgba(0,194,203,0.55)] active:text-[#00C2CB] active:brightness-100" 
   return (
@@ -447,31 +548,45 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
                         "transform 650ms cubic-bezier(0.22, 1, 0.36, 1), opacity 650ms ease",
                     }}
                   >
-                    <div className="relative w-full h-full rounded-[22px] overflow-hidden border border-[rgba(255,255,255,0.12)] shadow-[0_28px_80px_rgba(0,0,0,0.34)] bg-[#111827]">
-                      {/* Área clickeable según posición */}
-                      {isActive && (
+                    <div
+                      className="relative w-full h-full rounded-[22px] overflow-hidden border border-[rgba(255,255,255,0.12)] shadow-[0_28px_80px_rgba(0,0,0,0.34)] bg-[#111827]"
+                      onTouchStart={isActive ? handleSwipeTouchStart : undefined}
+                      onTouchMove={isActive ? handleSwipeTouchMove : undefined}
+                      onTouchEnd={isActive ? handleSwipeTouchEnd : undefined}
+                      style={
+                        isActive
+                          ? {
+                              transform: `translateX(${swipeOffsetX}px)`,
+                              transition: touchStartXRef.current !== null ? "none" : "transform 180ms ease-out",
+                            }
+                          : undefined
+                      }
+                    >
+                      {isActive && !isFullscreenMounted && (
                         <button
                           type="button"
                           onClick={openFullscreen}
-                          className={`absolute inset-0 z-10 ${interactiveButtonClass}`}
+                          // Quitamos interactiveButtonClass y dejamos solo lo necesario para hacer clic
+                          className="absolute inset-0 z-10 cursor-pointer outline-none"
                           aria-label="Abrir imagen en pantalla completa"
                         />
                       )}
-                    
-                      {isLeft && (
+
+                      {isLeft && !isFullscreenMounted && (
                         <button
                           type="button"
                           onClick={goToPrevious}
-                          className={`absolute inset-0 z-10 hidden md:block ${interactiveButtonClass}`}
+                          // Mantenemos hidden md:block para conservar el comportamiento en escritorio
+                          className="absolute inset-0 z-10 hidden md:block cursor-pointer outline-none"
                           aria-label="Ir a la imagen anterior"
                         />
                       )}
 
-                      {isRight && (
+                      {isRight && !isFullscreenMounted && (
                         <button
                           type="button"
                           onClick={goToNext}
-                          className={`absolute inset-0 z-10 hidden md:block ${interactiveButtonClass}`}
+                          className="absolute inset-0 z-10 hidden md:block cursor-pointer outline-none"
                           aria-label="Ir a la imagen siguiente"
                         />
                       )}
@@ -580,7 +695,7 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
           >
             <div className="relative w-screen h-screen overflow-hidden">
              {showRotateHint && (
-              <div className="absolute top-4 left-0 w-full flex justify-center z-40 pointer-events-none animate-rotate-hint-fade">
+              <div className="absolute top-[30vh] left-0 w-full flex justify-center z-40 pointer-events-none animate-rotate-hint-fade">
                 <div className="flex items-center justify-center w-11 h-11 rounded-full bg-[rgba(10,15,30,0.72)] border border-[rgba(255,255,255,0.1)] backdrop-blur-sm shadow-[0_8px_24px_rgba(0,0,0,0.28)]">
                   <Smartphone className="w-5 h-5 text-[#F0F4F8] animate-rotate-device-hint" />
                 </div>
@@ -589,10 +704,22 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
               {/* Imagen principal fullscreen */}
               <div
                 onClick={() => {
+                  if (didSwipeRef.current) {
+                    didSwipeRef.current = false
+                    return
+                  }
+
                   setShowFullscreenOverlayText(false)
                   setShowRotateHint(false)
                 }}
+                onTouchStart={handleSwipeTouchStart}
+                onTouchMove={handleSwipeTouchMove}
+                onTouchEnd={handleSwipeTouchEnd}
                 className="absolute inset-0 flex items-center justify-center px-4 sm:px-8"
+                style={{
+                  transform: `translateX(${swipeOffsetX}px)`,
+                  transition: touchStartXRef.current !== null ? "none" : "transform 180ms ease-out",
+                }}
               >
                 <div
                   className={`relative w-full h-full transition-all duration-300 ease-out ${getFullscreenImageAnimationClass()}`}
@@ -615,10 +742,10 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
 
               {/* Gradiente + texto fullscreen */}
               <div
-                className={`absolute inset-x-0 bottom-0 pointer-events-none transition-all duration-500 z-10 ${
+                className={`absolute left-0 right-0 bottom-0 px-6 pt-6 pb-8 sm:px-8 sm:pt-8 sm:pb-20 lg:px-12 lg:py-10 text-left pointer-events-none transition-all duration-500 z-20 ${
                   showFullscreenOverlayText && isFullscreenVisible
-                    ? "opacity-100"
-                    : "opacity-0"
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-2"
                 }`}
                 style={{
                   height: "36%",
@@ -628,7 +755,11 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
               />
 
               <div
-                className={`absolute left-0 right-0 bottom-0 px-6 pt-6 pb-16 sm:px-8 sm:pt-8 sm:pb-20 lg:px-12 lg:py-10 text-left pointer-events-none transition-all duration-500 z-20 ${
+                className={`absolute left-0 right-0 px-6 pt-6 sm:px-8 sm:pt-8 lg:px-12 lg:py-10 text-left pointer-events-none transition-all duration-500 z-20 ${
+                  isFullscreenPortraitMobile
+                    ? "bottom-28 pb-0"
+                    : "bottom-0 pb-8 sm:pb-20"
+                } ${
                   showFullscreenOverlayText && isFullscreenVisible
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-2"
@@ -680,7 +811,9 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
 
               {/* Dots fullscreen */}
               <div
-                className={`absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 z-30 transition-all duration-300 delay-150 ${
+                className={`absolute left-1/2 -translate-x-1/2 flex gap-1.5 z-30 transition-all duration-300 delay-150 ${
+                  isFullscreenPortraitMobile ? "bottom-20" : "bottom-6"
+                } ${
                   isFullscreenVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
                 }`}
               >
