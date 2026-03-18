@@ -587,14 +587,12 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
               </div>
             )}
               {/* Imagen principal fullscreen */}
-             <button
-                type="button"
+              <div
                 onClick={() => {
                   setShowFullscreenOverlayText(false)
                   setShowRotateHint(false)
                 }}
-                className="absolute inset-0 flex items-center justify-center px-4 sm:px-8 bg-transparent hover:bg-transparent active:bg-transparent focus:outline-none touch-manipulation"
-                aria-label="Ocultar información de la imagen"
+                className="absolute inset-0 flex items-center justify-center px-4 sm:px-8"
               >
                 <div
                   className={`relative w-full h-full transition-all duration-300 ease-out ${getFullscreenImageAnimationClass()}`}
@@ -613,7 +611,7 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
                     </div>
                   )}
                 </div>
-              </button>
+              </div>
 
               {/* Gradiente + texto fullscreen */}
               <div
@@ -992,7 +990,7 @@ function HeroSection({ onNavigate }: { onNavigate: (href: string) => void }) {
             transition: "all 600ms ease-out 300ms"
           }}
         >
-          Antes de comenzar el desarrollo, entendemos el problema. Antes de proponer una solución, escuchamos a las personas. Así es como construimos software que realmente suma.
+          Antes de comenzar el desarrollo, entendemos el problema. Antes de proponer una solución, escuchamos. Así es como construimos software que realmente suma.
         </p>
 
         {/* CTA Buttons */}
@@ -1040,17 +1038,17 @@ function AboutSection() {
     {
       icon: Search,
       title: "Análisis",
-      description: "Entendemos el problema, el contexto y los objetivos antes de escribir una sola línea de código."
+      description: "Entendemos el problema, el contexto y los objetivos antes de sentarnos a programar."
     },
     {
       icon: Pen,
       title: "Diseño",
-      description: "Definimos una solución clara, usable y escalable, pensada para funcionar bien desde el inicio."
+      description: "Con el problema entendido, pensamos la solución. Cómo tiene que funcionar, cómo se va a usar y cómo va a crecer con el tiempo."
     },
     {
       icon: Code,
       title: "Implementación",
-      description: "Construimos con énfasis en calidad, mantenibilidad y entregamos algo de lo que nos sentimos orgullosos."
+      description: "Construimos con énfasis en calidad, y entregamos algo de lo que nos sentimos orgullosos."
     }
   ]
 
@@ -1067,7 +1065,7 @@ function AboutSection() {
               Proceso <span className="text-[#00C2CB]">claro</span>, resultado <span className="text-[#00C2CB]">concreto</span>.
             </h2>
             <p className="text-base sm:text-[17px] text-[#B8C4D6] leading-relaxed">     
-              NODE3 es un estudio de ingeniería de software formado por tres estudiantes avanzados de ingeniería. Nos especializamos en el desarrollo de productos de Software como Servicio y soluciones digitales, siempre buscando entender al cliente para construir algo que realmente sume.
+              NODE3 es un estudio de ingeniería de software formado por tres estudiantes avanzados de ingeniería. Nos especializamos en construir productos digitales propios y soluciones a medida, siempre buscando comprender al cliente para crear algo con valor real.
             </p>
           </AnimatedSection>
 
@@ -1227,7 +1225,7 @@ function ProjectBlock({
 
             <div className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#161D2E] border border-[#1E293B]">
               <span className="font-mono text-xs text-[#94A3B8]">
-                MVP en desarrollo
+                En desarrollo
               </span>
             </div>
           </div>
@@ -1285,7 +1283,7 @@ function ProjectsSection() {
             </h2>
 
             <p className="text-[#B8C4D6] text-base sm:text-lg max-w-2xl mx-auto leading-relaxed text-pretty">
-              Dos productos SaaS propios, en desarrollo activo.
+              Dos productos de software propios, en desarrollo activo.
             </p>
 
             {/* Indicador visual suave */}
@@ -1365,7 +1363,7 @@ function ServicesSection() {
                 Software por suscripción, accesible desde cualquier dispositivo
               </p>
               <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                Identificamos problemas reales y construimos productos digitales propios para resolverlos. Diseñamos la solución, la desarrollamos con foco en calidad y la llevamos al mercado — pensada desde el principio para escalar y llegar a la mayor cantidad de personas posible.
+                Identificamos problemas reales y construimos productos digitales propios para resolverlos. Diseñamos la solución, la desarrollamos con foco en calidad y la llevamos al mercado. Pensando desde el principio para escalar y llegar a la mayor cantidad de personas posible.
               </p>
             </div>
           </AnimatedSection>
