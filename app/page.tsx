@@ -141,6 +141,7 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
   const [showFullscreenOverlayText, setShowFullscreenOverlayText] = useState(true)
 
   const [isFullscreenPortraitMobile, setIsFullscreenPortraitMobile] = useState(false)
+  const [isFullscreenLandscapeMobile, setIsFullscreenLandscapeMobile] = useState(false)
 
   const [showRotateHint, setShowRotateHint] = useState(false)
 
@@ -259,25 +260,27 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
   )
 
   useEffect(() => {
-  if (!isFullscreenMounted || !isFullscreenVisible) {
-    setIsFullscreenPortraitMobile(false)
-    return
-  }
+    if (!isFullscreenMounted || !isFullscreenVisible) {
+      setIsFullscreenPortraitMobile(false)
+      setIsFullscreenLandscapeMobile(false)
+      return
+    }
 
-  const updateFullscreenViewportMode = () => {
-    const isMobile = window.innerWidth < 768
-    const isPortrait = window.innerHeight > window.innerWidth
+    const updateFullscreenViewportMode = () => {
+      const isMobile = window.innerWidth < 768
+      const isPortrait = window.innerHeight > window.innerWidth
 
-    setIsFullscreenPortraitMobile(isMobile && isPortrait)
-  }
+      setIsFullscreenPortraitMobile(isMobile && isPortrait)
+      setIsFullscreenLandscapeMobile(isMobile && !isPortrait)
+    }
 
-  updateFullscreenViewportMode()
-  window.addEventListener("resize", updateFullscreenViewportMode)
+    updateFullscreenViewportMode()
+    window.addEventListener("resize", updateFullscreenViewportMode)
 
-  return () => {
-    window.removeEventListener("resize", updateFullscreenViewportMode)
-  }
-}, [isFullscreenMounted, isFullscreenVisible])
+    return () => {
+      window.removeEventListener("resize", updateFullscreenViewportMode)
+    }
+  }, [isFullscreenMounted, isFullscreenVisible])
 
   useEffect(() => {
     if (!isFullscreenMounted || !isFullscreenVisible) return
@@ -742,22 +745,23 @@ const handleSwipeTouchEnd = () => {
 
               {/* Gradiente + texto fullscreen */}
               <div
-                className={`absolute left-0 right-0 bottom-0 px-6 pt-6 pb-8 sm:px-8 sm:pt-8 sm:pb-20 lg:px-12 lg:py-10 text-left pointer-events-none transition-all duration-500 z-20 ${
+                className={`absolute left-0 right-0 bottom-0 pointer-events-none transition-all duration-500 z-20 ${
                   showFullscreenOverlayText && isFullscreenVisible
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-2"
                 }`}
                 style={{
-                  height: "36%",
+                  height: isFullscreenLandscapeMobile ? "24%" : isFullscreenPortraitMobile ? "34%" : "36%",
                   background:
                     "linear-gradient(to top, rgba(10, 15, 30, 0.96) 0%, rgba(10, 15, 30, 0.58) 38%, rgba(10, 15, 30, 0) 100%)",
                 }}
               />
-
               <div
                 className={`absolute left-0 right-0 px-6 pt-6 sm:px-8 sm:pt-8 lg:px-12 lg:py-10 text-left pointer-events-none transition-all duration-500 z-20 ${
                   isFullscreenPortraitMobile
-                    ? "bottom-28 pb-0"
+                    ? "bottom-[17rem] pb-0"
+                    : isFullscreenLandscapeMobile
+                    ? "bottom-0 pb-12"
                     : "bottom-0 pb-8 sm:pb-20"
                 } ${
                   showFullscreenOverlayText && isFullscreenVisible
@@ -812,7 +816,7 @@ const handleSwipeTouchEnd = () => {
               {/* Dots fullscreen */}
               <div
                 className={`absolute left-1/2 -translate-x-1/2 flex gap-1.5 z-30 transition-all duration-300 delay-150 ${
-                  isFullscreenPortraitMobile ? "bottom-20" : "bottom-6"
+                  isFullscreenPortraitMobile ? "bottom-60" : "bottom-6"
                 } ${
                   isFullscreenVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
                 }`}
@@ -916,6 +920,23 @@ function StaggeredBadges({
       ))}
     </div>
   )
+}
+
+function handleDelayedExternalLink(
+  e: React.MouseEvent<HTMLAnchorElement>,
+  url: string
+) {
+  const isMobileViewport = window.innerWidth < 768
+
+  if (!isMobileViewport) {
+    return
+  }
+
+  e.preventDefault()
+
+  window.setTimeout(() => {
+    window.open(url, "_blank", "noopener,noreferrer")
+  }, 150)
 }
 
 // =============================================
@@ -1317,8 +1338,10 @@ function TeamSection() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`Ver LinkedIn de ${member.name}`}
-                    className="text-[#94A3B8] hover:text-[#F0F4F8] transition-all duration-150 cursor-pointer hover:scale-110 active:scale-95"                  >
-                    <Linkedin className="w-5 h-5" strokeWidth={1.5} />
+                    onClick={(e) => handleDelayedExternalLink(e, member.linkedin)}
+                    className="text-[#94A3B8] hover:text-[#F0F4F8] transition-all duration-150 cursor-pointer hover:scale-110 active:scale-95"
+                  >
+                     <Linkedin className="w-5 h-5" />
                   </a>
                 </div>
               </div>
@@ -1496,7 +1519,7 @@ function ServicesSection() {
                 Software por suscripción, accesible desde cualquier dispositivo
               </p>
               <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                Identificamos problemas reales y construimos productos digitales propios para resolverlos. Diseñamos la solución, la desarrollamos con foco en calidad y la llevamos al mercado. Pensando desde el principio para escalar y llegar a la mayor cantidad de personas posible.
+                Identificamos problemas reales y construimos productos digitales propios para resolverlos. Diseñamos la solución, la desarrollamos con foco en calidad y la llevamos al mercado. Pensando desde el principio en escalar y llegar a la mayor cantidad de personas posible.
               </p>
             </div>
           </AnimatedSection>
@@ -1775,8 +1798,9 @@ function ContactSection() {
                 href="https://instagram.com/node3sw"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all duration-150 hover:scale-[1.03] active:scale-95 active:text-foreground"              >
-                <Instagram className="w-4 h-4" strokeWidth={1.5} />
+                onClick={(e) => handleDelayedExternalLink(e, "https://instagram.com/node3sw")}
+                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all duration-150 hover:scale-[1.03] active:scale-95 active:text-foreground"
+              >
                 <span className="text-sm">@node3sw</span>
               </a>
             </div>

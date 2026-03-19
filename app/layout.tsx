@@ -17,8 +17,8 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: 'NODE3 | Estudio de Ingeniería de Software',
-  description: 'Construimos software con criterio de ingeniería. Transformamos ideas en productos digitales sólidos, claros y bien ejecutados.',
-  generator: 'v0.app',
+  description: 'Soluciones reales para problemas reales.',
+
   icons: {
     icon: [
       {
@@ -35,6 +35,29 @@ export const metadata: Metadata = {
       },
     ],
     apple: '/apple-icon.png',
+  },
+
+  openGraph: {
+    title: 'NODE3 | Estudio de Ingeniería de Software',
+    description: 'Soluciones reales para problemas reales.',
+    url: 'https://landing-page-node3.vercel.app',
+    siteName: 'NODE3',
+    images: [
+      {
+        url: 'https://landing-page-node3.vercel.app/logos/node3-fondo.jpeg',
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: 'es_AR',
+    type: 'website',
+  },
+
+  twitter: {
+    card: 'summary_large_image',
+    title: 'NODE3 | Estudio de Ingeniería de Software',
+    description: 'Soluciones reales para problemas reales.',
+    images: ['https://landing-page-node3.vercel.app/logos/node3-fondo.jpeg'],
   },
 }
 
