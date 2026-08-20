@@ -8,8 +8,6 @@ import {
   Code, 
   Layers, 
   Terminal, 
-  Mail, 
-  Instagram, 
   ChevronDown, 
   ChevronLeft, 
   ChevronRight,
@@ -19,7 +17,9 @@ import {
   User,
   Linkedin,
   Maximize2,
-  Smartphone
+  Smartphone,
+  MessageCircle,
+  ExternalLink
 } from "lucide-react"
 import { createPortal } from "react-dom"
 
@@ -43,6 +43,12 @@ const gymNodeSlides = [
     src: "/projects/gym-node/cuotas.png",
     label: "Cuotas",
     description: "Control de pagos, vencimientos y estados de cuenta"
+  },
+  {
+    src: "/projects/gym-node/whatsapp.png",
+    label: "Mensajes automáticos por WhatsApp",
+    description: "Recordatorios automáticos de vencimientos y cuotas pendientes",
+    presentation: "portrait" as const
   },
   {
     src: "/projects/gym-node/caja-tesoreria.png",
@@ -127,6 +133,7 @@ type SlideData = {
   src: string
   label: string
   description: string
+  presentation?: "standard" | "portrait"
 }
 
 function ProjectCarousel({ slides }: { slides: SlideData[] }) {
@@ -382,7 +389,13 @@ function ProjectCarousel({ slides }: { slides: SlideData[] }) {
     if (slide.src) {
       return (
         <div className="absolute inset-0 flex items-center justify-center px-3 py-1.5 sm:px-4 sm:py-3 lg:p-5">
-          <div className="relative w-full h-full rounded-[18px] overflow-hidden bg-[#0F172A]">
+          <div
+            className={`relative h-full rounded-[18px] overflow-hidden bg-[#0F172A] ${
+              slide.presentation === "portrait"
+                ? "w-auto max-w-full aspect-[391/712]"
+                : "w-full"
+            }`}
+          >
             <Image
               src={slide.src}
               alt={alt}
@@ -1253,15 +1266,19 @@ function TeamSection() {
   const teamMembers = [
     {
       name: "Gabriel Alejo Mallet",
-      image: "/team/gabriel.jpg",
+      image: "/team/Gabriel.jpeg",
+      imagePosition: "50% 50%",
+      imageScale: "scale(1.05) translateX(3%)",
       linkedin: "https://www.linkedin.com/in/gabriel-alejo-mallet-566980398/",
       rolePrimary: "Co-Founder",
       roleSecondary: "Software Developer",
-      stack: "Java · Spring · PostgreSQL",
+      stack: "Frontend · UX · React",
     },
     {
       name: "Nicolás Gauchat",
-      image: "/team/gauchat.webp",
+      image: "/team/Nicolas.jpeg",
+      imagePosition: "50% 10%",
+      imageScale: "scale(1)",
       linkedin: "https://www.linkedin.com/in/nicolás-gauchat/",
       rolePrimary: "Co-Founder",
       roleSecondary: "Software Developer",
@@ -1269,11 +1286,13 @@ function TeamSection() {
     },
     {
       name: "Juan Ignacio Poggi",
-      image: "/team/juan.webp",
+      image: "/team/Juan.jpeg",
+      imagePosition: "50% 74%",
+      imageScale: "scale(1.35) translateY(-6%)",
       linkedin: "https://www.linkedin.com/in/juan-ignacio-poggi-5089a7334/",
       rolePrimary: "Co-Founder",
       roleSecondary: "Software Developer",
-      stack: "Frontend · UX · React",
+      stack: "Java · Spring · PostgreSQL",
     },
   ]
 
@@ -1305,6 +1324,10 @@ function TeamSection() {
                     alt={member.name}
                     fill
                     className="object-cover"
+                    style={{
+                      objectPosition: member.imagePosition,
+                      transform: member.imageScale
+                    }}
                   />
                 </div>
 
@@ -1361,12 +1384,16 @@ function ProjectBlock({
   description,
   stack,
   slides,
+  externalHref,
+  externalLabel,
   delay = 0
 }: {
   name: string
   description: string
   stack: string[]
   slides: SlideData[]
+  externalHref?: string
+  externalLabel?: string
   delay?: number
 }) {
   return (
@@ -1379,11 +1406,24 @@ function ProjectBlock({
               {name}
             </h3>
 
-            <div className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#161D2E] border border-[#1E293B]">
-              <span className="font-mono text-xs text-[#94A3B8]">
-                En desarrollo
-              </span>
-            </div>
+            {externalHref && externalLabel ? (
+              <a
+                href={externalHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => handleDelayedExternalLink(e, externalHref)}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[#161D2E]/70 border border-[#1E293B] font-mono text-[11px] sm:text-xs text-[#94A3B8] touch-manipulation transition-all duration-150 hover:text-[#F0F4F8] hover:border-[#334155] active:scale-95"
+              >
+                {externalLabel}
+                <ExternalLink className="w-3.5 h-3.5" strokeWidth={1.5} />
+              </a>
+            ) : (
+              <div className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#161D2E] border border-[#1E293B]">
+                <span className="font-mono text-xs text-[#94A3B8]">
+                  En desarrollo
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -1411,6 +1451,7 @@ function ProjectBlock({
                     </span>
                   ))}
                 </div>
+
               </div>
             </div>
           </div>
@@ -1462,9 +1503,11 @@ function ProjectsSection() {
           <div className="mb-20 sm:mb-24">
             <ProjectBlock
               name="Gym Node"
-              description="Sistema de gestión para gimnasios diseñado para centralizar la operación diaria en una sola plataforma. Permite administrar clientes, asistencias, cuotas, precios e información administrativa con una estructura clara, moderna y preparada para crecer."
+              description="Sistema de gestión para gimnasios que centraliza clientes, asistencias, cuotas e información administrativa. También automatiza el envío de mensajes por WhatsApp, como recordatorios de vencimientos y pagos pendientes, para reducir tareas manuales y mejorar el seguimiento de cada socio."
               stack={["Java", "Spring Boot", "PostgreSQL", "React", "Docker", "JWT"]}
               slides={gymNodeSlides}
+              externalHref="https://gymnode.node3.com.ar/"
+              externalLabel="Visitar Gym Node"
               delay={100}
             />
           </div>
@@ -1503,7 +1546,7 @@ function ServicesSection() {
         </AnimatedSection>
 
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Primary Service - SaaS */}
+          {/* Primary Service - Custom */}
           <AnimatedSection direction="up" delay={100}>
             <div className="relative h-full p-6 sm:p-8 rounded-xl bg-[#161D2E] border border-[#00C2CB]/30 hover:border-[#00C2CB]/50 hover:-translate-y-1 transition-all duration-250 ease-out">
               {/* Badge */}
@@ -1511,6 +1554,19 @@ function ServicesSection() {
                 <span className="text-[10px] sm:text-xs font-medium text-[#00C2CB]">especialidad</span>
               </div>
 
+              <Terminal className="w-6 h-6 sm:w-7 sm:h-7 text-[#00C2CB] mb-4" strokeWidth={1.5} />
+              <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-3">
+                Desarrollo a medida
+              </h3>
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+                Si tenés un problema o una idea pero no sabés bien por dónde arrancar, nosotros te ayudamos a darle forma. Definimos la solución juntos y la construimos con criterio y foco en lo que realmente necesitás.
+              </p>
+            </div>
+          </AnimatedSection>
+
+          {/* Secondary Service - SaaS */}
+          <AnimatedSection direction="up" delay={200}>
+            <div className="h-full p-6 sm:p-8 rounded-xl bg-[#161D2E] border border-[#1E293B] hover:border-[#00C2CB]/30 hover:-translate-y-1 transition-all duration-250 ease-out">
               <Layers className="w-6 h-6 sm:w-7 sm:h-7 text-[#00C2CB] mb-4" strokeWidth={1.5} />
               <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-1">
                 Desarrollo de productos SaaS
@@ -1520,19 +1576,6 @@ function ServicesSection() {
               </p>
               <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                 Identificamos problemas reales y construimos productos digitales propios para resolverlos. Diseñamos la solución, la desarrollamos con foco en calidad y la llevamos al mercado. Pensando desde el principio en escalar y llegar a la mayor cantidad de personas posible.
-              </p>
-            </div>
-          </AnimatedSection>
-
-          {/* Secondary Service - Custom */}
-          <AnimatedSection direction="up" delay={200}>
-            <div className="h-full p-6 sm:p-8 rounded-xl bg-[#161D2E] border border-[#1E293B] hover:border-[#00C2CB]/30 hover:-translate-y-1 transition-all duration-250 ease-out">
-              <Terminal className="w-6 h-6 sm:w-7 sm:h-7 text-[#00C2CB] mb-4" strokeWidth={1.5} />
-              <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-3">
-                Desarrollo a medida
-              </h3>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                Si tenés un problema o una idea pero no sabés bien por dónde arrancar, nosotros te ayudamos a darle forma. Definimos la solución juntos y la construimos con criterio y foco en lo que realmente necesitás.
               </p>
             </div>
           </AnimatedSection>
@@ -1581,109 +1624,8 @@ function TechnologiesSection() {
 // =============================================
 
 function ContactSection() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: ""
-  })
-
-  const [errors, setErrors] = useState({
-    name: "",
-    email: "",
-    message: ""
-  })
-
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
-  const [submitMessage, setSubmitMessage] = useState("")
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    // Reseteamos estados visuales previos
-    setSubmitStatus("idle")
-    setSubmitMessage("")
-
-    const newErrors = {
-      name: "",
-      email: "",
-      message: ""
-    }
-
-    let hasErrors = false
-
-    // Validación del nombre
-    if (!formData.name.trim()) {
-      newErrors.name = "Por favor, ingresá tu nombre."
-      hasErrors = true
-    }
-
-    // Validación del email
-    if (!formData.email.trim()) {
-      newErrors.email = "Por favor, ingresá tu email."
-      hasErrors = true
-    } else {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(formData.email)) {
-        newErrors.email = "Ingresá un email válido."
-        hasErrors = true
-      }
-    }
-
-    // Validación del mensaje
-    if (!formData.message.trim()) {
-      newErrors.message = "Por favor, escribí tu mensaje."
-      hasErrors = true
-    }
-
-    setErrors(newErrors)
-
-    if (hasErrors) return
-
-    try {
-      setIsSubmitting(true)
-
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || "No se pudo enviar el mensaje.")
-      }
-
-      setSubmitStatus("success")
-      setSubmitMessage("Mensaje enviado correctamente. Te responderemos pronto.")
-
-      // Limpiamos el formulario si salió bien
-      setFormData({
-        name: "",
-        email: "",
-        message: ""
-      })
-
-      setErrors({
-        name: "",
-        email: "",
-        message: ""
-      })
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "No se pudo enviar el mensaje. Intentá nuevamente."
-
-      setSubmitStatus("error")
-      setSubmitMessage(message)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+  const whatsappMessage = "¡Hola! Vi la web de NODE3 y quería contarles sobre un proyecto."
+  const whatsappHref = `https://wa.me/543492288582?text=${encodeURIComponent(whatsappMessage)}`
 
   return (
     <section
@@ -1707,93 +1649,36 @@ function ContactSection() {
         </AnimatedSection>
 
         <AnimatedSection direction="up" delay={200}>
-          <form onSubmit={handleSubmit} noValidate className="space-y-4 sm:space-y-5">
-            <div>
-              <input
-                type="text"
-                placeholder="Tu nombre"
-                value={formData.name}
-                onChange={(e) => {
-                  setFormData({ ...formData, name: e.target.value })
-                  setErrors((prev) => ({ ...prev, name: "" }))
-                }}
-                className={`w-full px-4 py-3 rounded-lg bg-[#161D2E] border text-foreground placeholder:text-muted-foreground focus:border-[#00C2CB] focus:outline-none transition-colors duration-200 ${
-                  errors.name ? "border-red-500" : "border-[#1E293B]"
-                }`}
-              />
-              {errors.name && (
-                <p className="mt-2 text-sm text-red-400">{errors.name}</p>
-              )}
+          <div className="max-w-2xl mx-auto rounded-2xl bg-[#161D2E] border border-[#1E293B] px-6 py-7 sm:px-8 sm:py-8 text-center hover:border-[rgba(0,194,203,0.3)] hover:shadow-[0_0_24px_rgba(0,194,203,0.08)] transition-all duration-200">
+            <div className="w-10 h-10 mx-auto mb-4 rounded-full bg-[#00C2CB]/10 border border-[#00C2CB]/30 flex items-center justify-center">
+              <MessageCircle className="w-5 h-5 text-[#00C2CB]" strokeWidth={1.7} />
             </div>
 
-            <div>
-              <input
-                type="email"
-                placeholder="Tu email"
-                value={formData.email}
-                onChange={(e) => {
-                  setFormData({ ...formData, email: e.target.value })
-                  setErrors((prev) => ({ ...prev, email: "" }))
-                }}
-                className={`w-full px-4 py-3 rounded-lg bg-[#161D2E] border text-foreground placeholder:text-muted-foreground focus:border-[#00C2CB] focus:outline-none transition-colors duration-200 ${
-                  errors.email ? "border-red-500" : "border-[#1E293B]"
-                }`}
-              />
-              {errors.email && (
-                <p className="mt-2 text-sm text-red-400">{errors.email}</p>
-              )}
-            </div>
+            <h3 className="text-xl font-bold text-foreground mb-3">
+              Contanos qué tenés en mente
+            </h3>
+            <p className="text-sm text-[#B8C4D6] leading-relaxed max-w-lg mx-auto mb-6">
+              Escribinos por WhatsApp y charlamos sobre tu idea, lo que necesitás y cómo podemos ayudarte a construirlo.
+            </p>
 
-            <div>
-              <textarea
-                placeholder="Contanos de qué se trata tu proyecto"
-                value={formData.message}
-                onChange={(e) => {
-                  setFormData({ ...formData, message: e.target.value })
-                  setErrors((prev) => ({ ...prev, message: "" }))
-                }}
-                rows={5}
-                className={`w-full px-4 py-3 rounded-lg bg-[#161D2E] border text-foreground placeholder:text-muted-foreground focus:border-[#00C2CB] focus:outline-none transition-colors duration-200 resize-none ${
-                  errors.message ? "border-red-500" : "border-[#1E293B]"
-                }`}
-              />
-              {errors.message && (
-                <p className="mt-2 text-sm text-red-400">{errors.message}</p>
-              )}
-            </div>
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Hablar con NODE3 por WhatsApp"
+              className="w-full sm:w-auto min-w-[220px] inline-flex items-center justify-center gap-2 px-7 py-3 rounded-lg bg-[#00C2CB] text-[#0A0F1E] font-semibold text-sm touch-manipulation transition-all duration-150 hover:shadow-[0_0_20px_rgba(0,194,203,0.25)] hover:scale-[1.02] active:scale-95 active:brightness-95 active:shadow-none"
+            >
+              <MessageCircle className="w-5 h-5" strokeWidth={2} />
+              Hablemos por WhatsApp
+            </a>
 
-            <div className="flex justify-center pt-2">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full sm:w-auto min-w-[220px] px-8 py-3 rounded-lg bg-[#00C2CB] text-[#0A0F1E] font-semibold text-sm touch-manipulation transition-all duration-150 hover:shadow-[0_0_20px_rgba(0,194,203,0.25)] hover:scale-[1.02] active:scale-95 active:brightness-95 active:shadow-none disabled:opacity-60 disabled:cursor-not-allowed">
-                {isSubmitting ? "Enviando..." : "Enviar mensaje"}
-              </button>
-            </div>
+            <p className="mt-3 font-mono text-xs text-[#94A3B8]">
+              +54 3492 28-8582
+            </p>
+          </div>
 
-            {submitMessage && (
-              <div className="flex justify-center pt-2">
-                <p
-                  className={`text-sm text-center ${
-                    submitStatus === "success" ? "text-[#00C2CB]" : "text-red-400"
-                  }`}
-                >
-                  {submitMessage}
-                </p>
-              </div>
-            )}
-          </form>
-
-          {/* Contact Info */}
-          <div className="mt-10 pt-8 border-t border-[#1E293B]">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
-              <a
-                href="mailto:node3solutions@gmail.com"
-                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-all duration-150 hover:scale-[1.03] active:scale-95 active:text-foreground"              >
-                <Mail className="w-4 h-4" strokeWidth={1.5} />
-                <span className="text-sm">node3solutions@gmail.com</span>
-              </a>
-
+          <div className="max-w-2xl mx-auto mt-8 pt-6 border-t border-[#1E293B]">
+            <div className="flex items-center justify-center">
               <a
                 href="https://instagram.com/node3sw"
                 target="_blank"
