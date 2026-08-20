@@ -1412,7 +1412,7 @@ function ProjectBlock({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => handleDelayedExternalLink(e, externalHref)}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[#161D2E]/70 border border-[#1E293B] font-mono text-[11px] sm:text-xs text-[#94A3B8] touch-manipulation transition-all duration-150 hover:text-[#F0F4F8] hover:border-[#334155] active:scale-95"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[#161D2E]/70 border border-[#00C2CB]/35 font-mono text-[11px] sm:text-xs text-[#94A3B8] touch-manipulation transition-all duration-150 hover:text-[#F0F4F8] hover:border-[#00C2CB]/60 active:scale-95"
               >
                 {externalLabel}
                 <ExternalLink className="w-3.5 h-3.5" strokeWidth={1.5} />
@@ -1642,8 +1642,8 @@ function ContactSection() {
               ¿Tenés un <span className="text-[#00C2CB]">proyecto</span> en mente?
             </h2>
             <p className="text-[#B8C4D6] text-pretty leading-relaxed">
-              Si estás buscando un equipo técnico claro, serio y comprometido
-              con construir bien, conversemos.
+              Si buscás un equipo técnico claro, serio y comprometido con
+              construir bien, hablemos.
             </p>
           </div>
         </AnimatedSection>
@@ -1655,10 +1655,11 @@ function ContactSection() {
             </div>
 
             <h3 className="text-xl font-bold text-foreground mb-3">
-              Contanos qué tenés en mente
+              Demos el primer paso
             </h3>
             <p className="text-sm text-[#B8C4D6] leading-relaxed max-w-lg mx-auto mb-6">
-              Escribinos por WhatsApp y charlamos sobre tu idea, lo que necesitás y cómo podemos ayudarte a construirlo.
+              Escribinos por WhatsApp, contanos brevemente qué necesitás y vemos
+              juntos cómo convertirlo en una solución concreta.
             </p>
 
             <a
